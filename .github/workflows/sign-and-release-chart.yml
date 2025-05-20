@@ -52,7 +52,7 @@ jobs:
     - name: Move CR folder to charts/springboot-chart/templates
       run:  |
         cp -rf .cr-gpg charts/springboot-chart/templates
-        cp charts/Chart.yaml charts/springboot-chart/templates
+        cp charts/springboot-chart/Chart.yaml charts/springboot-chart/templates
 
     - name: Characteristics for .cr-gpg/secring.gpg
       run: |
