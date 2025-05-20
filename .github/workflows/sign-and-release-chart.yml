@@ -49,26 +49,26 @@ jobs:
     - name: List files in .cr-gpg
       run: ls -la .cr-gpg
 
-    - name: Move CR folder to charts/templates
+    - name: Move CR folder to charts/springboot-chart/templates
       run:  |
-        cp -rf .cr-gpg charts/templates
-        cp charts/Chart.yaml charts/templates
+        cp -rf .cr-gpg charts/springboot-chart/templates
+        cp charts/Chart.yaml charts/springboot-chart/templates
 
     - name: Characteristics for .cr-gpg/secring.gpg
       run: |
-        file charts/templates/.cr-gpg/secring.gpg
+        file charts/springboot-chart/templates/.cr-gpg/secring.gpg
         wc .cr-gpg/secring.gpg
-        wc charts/templates/.cr-gpg/secring.gpg
+        wc charts/springboot-chart/templates/.cr-gpg/secring.gpg
         
     - name: Add repositories
       run: |
-        for dir in $(ls -d charts/*/); do
+        for dir in $(ls -d charts/springboot-chart/*/); do
           helm dependency list $dir 2> /dev/null | tail +2 | head -n -1 | awk '{ print "helm repo add " $1 " " $3 }' | while read cmd; do $cmd; done
         done
       
     - name: Dependency update
       run: |
-        cd charts/templates
+        cd charts/springboot-chart/templates
         helm dependency update
         
 
