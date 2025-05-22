@@ -41,8 +41,6 @@ jobs:
         gpg --export-secret-key --pinentry-mode=loopback --yes --passphrase "pass" > "$keyring"
         passphrase_file="$gpg_dir/passphrase"
         echo "$GPG_PASSPHRASE" > "$passphrase_file" #storing passphrase data into a file
-        echo "CR_PASSPHRASE_FILE=$passphrase_file" >> "$GITHUB_ENV" #saving passphrase into github-environment
-        echo "CR_KEYRING=$keyring" >> "$GITHUB_ENV" #saving private key into github-environemnt
       env:
         GPG_KEYRING_BASE64: "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" #Referring secrets of github above
         GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"  
