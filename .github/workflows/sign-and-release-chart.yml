@@ -31,6 +31,7 @@ jobs:
     - name: Import GPG private key
       run: |
         echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+        gpg --list-secret-keys --keyid-format LONG
     
     - name: Prepare GPG key #this step is for using exported keys and make your github runner
       run: |
