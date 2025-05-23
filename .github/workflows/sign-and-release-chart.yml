@@ -47,16 +47,17 @@ jobs:
 
     - name: Prepare GPG key
       run: |
-        export GNUPGHOME="$(mktemp -d)" # Use isolated GPG home for clean setup
+        export GNUPGHOME="$(mktemp -d)" # Isolated temp GPG directory
+    
         echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
+    
         mkdir -p ~/.gnupg
         gpg --export > ~/.gnupg/pubring.gpg
         gpg --export-secret-keys > ~/.gnupg/secring.gpg
         echo "$GPG_PASSPHRASE" > ~/.gnupg/passphrase.txt
       env:
-        GPG_KEYRING_BASE64: "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" #Referring secrets of github above
-        GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}" 
-
+        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
     - name: List files in .cr-gpg
       run: ls -la .cr-gpg
