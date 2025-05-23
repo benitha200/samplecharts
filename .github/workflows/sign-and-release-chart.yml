@@ -55,7 +55,6 @@ jobs:
         # Trust all imported keys (avoid user prompts)
         echo "trust-model always" >> "$GNUPGHOME/gpg.conf"
         echo "allow-loopback-pinentry" >> "$GNUPGHOME/gpg.conf"
-        echo "use-agent" >> "$GNUPGHOME/gpg.conf"
     
         # Create ~/.gnupg directory for CR compatibility
         mkdir -p ~/.gnupg
@@ -69,6 +68,7 @@ jobs:
       env:
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
 
 
     - name: List files in .cr-gpg
