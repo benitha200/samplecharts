@@ -40,6 +40,13 @@ jobs:
       with:
         version: v3.14.3  # Specify the Helm version
 
+    # export pubring.gpg
+    - name: Export public key to pubring.gpg
+      run: |
+        mkdir -p ~/.gnupg
+        gpg --export --output ~/.gnupg/pubring.gpg
+
+
     # Step 4: Import your GPG private key from GitHub Secrets
     - name: Import GPG private key
       run: |
