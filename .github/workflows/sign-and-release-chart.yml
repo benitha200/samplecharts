@@ -40,12 +40,6 @@ jobs:
       with:
         version: v3.14.3  # Specify the Helm version
 
-    # export pubring.gpg
-    - name: Export public key to pubring.gpg
-      run: |
-        mkdir -p ~/.gnupg
-        gpg --export --output ~/.gnupg/pubring.gpg
-
 
     # Step 4: Import your GPG private key from GitHub Secrets
     - name: Import GPG private key
@@ -59,7 +53,9 @@ jobs:
         gpg_dir=.cr-gpg
         mkdir "$gpg_dir"
         keyring="$gpg_dir/secring.gpg"  # Exported secret keyring file
+        gpg --list-keys
         gpg --export-secret-key --pinentry-mode=loopback --yes --passphrase "pass" > "$keyring"
+        gpg --export --output ~/.gnupg/pubring.gpg
         passphrase_file="$gpg_dir/passphrase"
         echo "$GPG_PASSPHRASE" > "$passphrase_file"  # Store passphrase in a file
       env:
