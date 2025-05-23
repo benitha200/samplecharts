@@ -56,6 +56,7 @@ jobs:
         passphrase_file="$gpg_dir/passphrase"
         echo "$GPG_PASSPHRASE" > "$passphrase_file"  # Store passphrase in a file
       env:
+        GPG_KEYRING_BASE64: "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" 
         GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"  # Passphrase to unlock the GPG key
 
     # Step 6: List generated GPG keyring files for debugging
