@@ -1,0 +1,101 @@
+# Workflow Name
+name: Sign and Push Helm Chart
+
+# Trigger this workflow when:
+# - A tag matching the pattern 'v.*' is pushed
+# - The main branch is pushed to
+on:
+  push:
+    tags:
+      - 'v.*'
+    branches:
+      - main
+
+# Define the job
+jobs:
+  sign-and-push:
+    # This allows the job to write to the repo (e.g., create releases)
+    permissions:
+      contents: write
+
+    # Define the runner
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history and tags (needed for Helm chart-releaser)
+
+    # Step 2: Configure Git with your user identity
+    - name: Configure Git
+      run: |
+        git config user.name "benitha200"
+        git config user.email "benithaiyuyisenga2002@gmail.com"
+
+    # Step 3: Set up Helm CLI
+    - name: Set up Helm
+      uses: azure/setup-helm@v4.3.0
+      with:
+        version: v3.14.3  # Specify the Helm version
+
+    # Step 4: Import your GPG private key from GitHub Secrets
+    - name: Import GPG private key
+      run: |
+        echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+        gpg --list-secret-keys --keyid-format LONG  # Verify imported keys
+
+    # Step 5: Prepare GPG key material for use with Helm chart-releaser
+    - name: Prepare GPG key
+      run: |
+        gpg_dir=.cr-gpg
+        mkdir "$gpg_dir"
+        keyring="$gpg_dir/secring.gpg"  # Exported secret keyring file
+        gpg --export-secret-key --pinentry-mode=loopback --yes --passphrase "pass" > "$keyring"
+        passphrase_file="$gpg_dir/passphrase"
+        echo "$GPG_PASSPHRASE" > "$passphrase_file"  # Store passphrase in a file
+      env:
+        GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"  # Passphrase to unlock the GPG key
+
+    # Step 6: List generated GPG keyring files for debugging
+    - name: List files in .cr-gpg
+      run: ls -la .cr-gpg
+
+    # Step 7: Move the GPG configuration folder and Chart.yaml into templates directory
+    - name: Move CR folder to charts/springboot-chart/templates
+      run:  |
+        cp -rf .cr-gpg charts/springboot-chart/templates
+        cp charts/springboot-chart/Chart.yaml charts/springboot-chart/templates
+
+    # Step 8: Show characteristics of the GPG keyring files (for debugging)
+    - name: Characteristics for .cr-gpg/secring.gpg
+      run: |
+        file charts/springboot-chart/templates/.cr-gpg/secring.gpg
+        wc .cr-gpg/secring.gpg
+        wc charts/springboot-chart/templates/.cr-gpg/secring.gpg
+
+    # Step 9: Add required Helm repositories by scanning Chart.yaml dependencies
+    - name: Add repositories
+      run: |
+        for dir in $(ls -d charts/springboot-chart/*/); do
+          helm dependency list $dir 2> /dev/null | tail +2 | head -n -1 | awk '{ print "helm repo add " $1 " " $3 }' | while read cmd; do $cmd; done
+        done
+
+    # Step 10: Update chart dependencies
+    - name: Dependency update
+      run: |
+        cd charts/springboot-chart/templates
+        helm dependency update
+
+    # Step 11: Run Helm chart releaser to package, sign, and push chart
+    - name: Run chart-releaser
+      uses: helm/chart-releaser-action@v1.7.0
+      with:
+        charts_dir: ./charts/springboot-chart/  # Directory containing the Helm chart
+
+      env:
+        CR_TOKEN: "${{ secrets.PAT }}"  # GitHub personal access token to create release
+        CR_KEY: "${{ secrets.CR_KEY_ID }}"  # GPG key ID used for signing
+        CR_SIGN: true  # Enable GPG signing of the chart
+        CR_SKIP_EXISTING: true  # Skip if the release already exists
