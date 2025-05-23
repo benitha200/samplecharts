@@ -47,17 +47,29 @@ jobs:
 
     - name: Prepare GPG key
       run: |
-        export GNUPGHOME="$(mktemp -d)" # Isolated temp GPG directory
+        export GNUPGHOME="$(mktemp -d)"  # Temporary GPG home
     
+        # Import private key
         echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
     
+        # Trust all imported keys (avoid user prompts)
+        echo "trust-model always" >> "$GNUPGHOME/gpg.conf"
+        echo "allow-loopback-pinentry" >> "$GNUPGHOME/gpg.conf"
+        echo "use-agent" >> "$GNUPGHOME/gpg.conf"
+    
+        # Create ~/.gnupg directory for CR compatibility
         mkdir -p ~/.gnupg
-        gpg --export > ~/.gnupg/pubring.gpg
-        gpg --export-secret-keys > ~/.gnupg/secring.gpg
+    
+        # Export keyrings needed by chart-releaser
+        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export > ~/.gnupg/pubring.gpg
+        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export-secret-keys > ~/.gnupg/secring.gpg
+    
+        # Save passphrase for CR
         echo "$GPG_PASSPHRASE" > ~/.gnupg/passphrase.txt
       env:
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
 
     - name: List files in .cr-gpg
       run: ls -la .cr-gpg
