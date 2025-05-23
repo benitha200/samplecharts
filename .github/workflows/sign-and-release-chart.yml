@@ -54,16 +54,22 @@ jobs:
     
         # Trust all imported keys (avoid user prompts)
         echo "trust-model always" >> "$GNUPGHOME/gpg.conf"
-        echo "allow-loopback-pinentry" >> "$GNUPGHOME/gpg.conf"
     
-        # Create ~/.gnupg directory for CR compatibility
+        # Allow loopback pinentry (needed for passphrase input)
+        echo "allow-loopback-pinentry" >> "$GNUPGHOME/gpg-agent.conf"
+    
+        # Start gpg-agent to pick up config
+        gpgconf --kill gpg-agent || true
+        gpgconf --launch gpg-agent
+    
+        # Create ~/.gnupg directory for chart-releaser compatibility
         mkdir -p ~/.gnupg
     
         # Export keyrings needed by chart-releaser
         gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export > ~/.gnupg/pubring.gpg
         gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export-secret-keys > ~/.gnupg/secring.gpg
     
-        # Save passphrase for CR
+        # Save passphrase for chart-releaser
         echo "$GPG_PASSPHRASE" > ~/.gnupg/passphrase.txt
       env:
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
