@@ -48,19 +48,45 @@ jobs:
         gpg --list-secret-keys --keyid-format LONG  # Verify imported keys
 
     # Step 5: Prepare GPG key material for use with Helm chart-releaser
+    # - name: Prepare GPG key
+    #   run: |
+    #     gpg_dir=.cr-gpg
+    #     mkdir "$gpg_dir"
+    #     keyring="$gpg_dir/secring.gpg"  # Exported secret keyring file
+    #     gpg --list-keys
+    #     gpg --export-secret-key --pinentry-mode=loopback --yes --passphrase "pass" > "$keyring"
+    #     gpg --export --output ~/.gnupg/pubring.gpg
+    #     passphrase_file="$gpg_dir/passphrase"
+    #     echo "$GPG_PASSPHRASE" > "$passphrase_file"  # Store passphrase in a file
+    #   env:
+    #     GPG_KEYRING_BASE64: "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" 
+    #     GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"  # Passphrase to unlock the GPG key
+
     - name: Prepare GPG key
       run: |
         gpg_dir=.cr-gpg
-        mkdir "$gpg_dir"
-        keyring="$gpg_dir/secring.gpg"  # Exported secret keyring file
-        gpg --list-keys
-        gpg --export-secret-key --pinentry-mode=loopback --yes --passphrase "pass" > "$keyring"
-        gpg --export --output ~/.gnupg/pubring.gpg
+        mkdir -p "$gpg_dir"
+    
+        # Export secret keyring
+        keyring="$gpg_dir/secring.gpg"
+        gpg --export-secret-key --pinentry-mode=loopback --yes --passphrase "$GPG_PASSPHRASE" > "$keyring"
+    
+        # Export public keyring
+        pubring="$gpg_dir/pubring.gpg"
+        gpg --export --output "$pubring"
+    
+        # Encode public keyring to Base64
+        base64 "$pubring" > "$gpg_dir/pubring.gpg.b64"
+    
+        # Optionally print Base64 (for debugging, not recommended in public logs)
+        cat "$gpg_dir/pubring.gpg.b64"
+    
+        # Store passphrase in a file
         passphrase_file="$gpg_dir/passphrase"
-        echo "$GPG_PASSPHRASE" > "$passphrase_file"  # Store passphrase in a file
+        echo "$GPG_PASSPHRASE" > "$passphrase_file"
       env:
-        GPG_KEYRING_BASE64: "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" 
-        GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"  # Passphrase to unlock the GPG key
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
 
     # Step 6: List generated GPG keyring files for debugging
     - name: List files in .cr-gpg
