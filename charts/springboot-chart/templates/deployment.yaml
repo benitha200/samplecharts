@@ -4,6 +4,8 @@ metadata:
   name: {{ include "springboot-chart.fullname" . }}
   labels:
     {{- include "springboot-chart.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-options: Replace=true
 
 spec:
   {{- if not .Values.autoscaling.enabled }}
