@@ -41,6 +41,7 @@ jobs:
       run: |
         # Create a temporary GPG home directory and a persistent .cr-gpg directory
         mkdir -p .cr-gpg
+        mkdir -p .gnupg
         export GNUPGHOME=$(mktemp -d)
 
         # Import the private GPG key used to sign charts
