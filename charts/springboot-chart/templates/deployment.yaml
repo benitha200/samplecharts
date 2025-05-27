@@ -43,12 +43,12 @@ spec:
             - name: http
               containerPort: {{ .Values.containerPort }}
               protocol: TCP
-          {{- if .Values.healthCheck.enabled }}
+          #{{- if .Values.healthCheck.enabled }}
           readinessProbe:
             {{- toYaml .Values.healthCheck.readinessProbe | nindent 10 }}
           livenessProbe:
             {{- toYaml .Values.healthCheck.livenessProbe | nindent 10 }}
-          {{- end }}
+          #{{- end }}
 
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
