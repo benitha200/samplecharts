@@ -1,7 +1,5 @@
-# Name of the GitHub Actions workflow
-name: Sign and Release Helm Chart
+name: Sign and Push Helm Chart
 
-# Trigger the workflow when pushing a tag matching v.* or pushing to the main branch
 on:
   push:
     tags:
@@ -11,97 +9,76 @@ on:
 
 jobs:
   sign-and-push:
-    # Allow this workflow to write to the repository content (required for releases)
     permissions:
       contents: write
-    # Use the latest Ubuntu runner for this job
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout the entire repository history (important for Helm chart releases)
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0  # Fetch full git history
-
-    # Step 2: Configure Git with a username and email (used in chart-releaser)
+        fetch-depth: 0
+    
     - name: Configure Git
       run: |
         git config user.name "benitha200"
         git config user.email "benithaiyuyisenga2002@gmail.com"
-
-    # Step 3: Install Helm CLI of a specific version
+    
     - name: Set up Helm
       uses: azure/setup-helm@v4.3.0
       with:
-        version: v3.14.3  # Helm version to use
+        version: v3.14.3
 
-    # Step 4: Prepare GPG key files for signing charts
     - name: Prepare GPG key for chart-releaser
       run: |
-        # Create a temporary GPG home directory and a persistent .cr-gpg directory
+        # Create .cr-gpg directory explicitly
         mkdir -p .cr-gpg
-        mkdir -p /home/runner/.gnupg
+
+        # Use temporary GNUPGHOME so gpg commands don't interfere with user's keyring
         export GNUPGHOME=$(mktemp -d)
 
-        # Import the private GPG key used to sign charts
+        # Import private key into temporary keyring
         echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
 
-        # Ensure all imported keys are trusted and allow loopback for passphrase
+        # Trust all imported keys (avoid prompts)
         echo "trust-model always" >> "$GNUPGHOME/gpg.conf"
         echo "allow-loopback-pinentry" >> "$GNUPGHOME/gpg-agent.conf"
 
-        # Restart the gpg-agent to apply the new config
+        # Restart gpg-agent to load new config
         gpgconf --kill gpg-agent || true
         gpgconf --launch gpg-agent
 
-        # Export the public and secret keyrings to .cr-gpg directory
+        # Export public keyring and secret keyring into .cr-gpg directory
         gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export > .cr-gpg/pubring.gpg
         gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export-secret-keys > .cr-gpg/secring.gpg
 
-        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export > /home/runner/.gnupg/pubring.gpg
-        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export-secret-keys > /home/runner/.gnupg/secring.gpg
-
-        # Save GPG passphrase to file for use by chart-releaser
+        # Save passphrase for chart-releaser
         echo "$GPG_PASSPHRASE" > .cr-gpg/passphrase
-        echo "$GPG_PASSPHRASE" > /home/runner/.gnupg/passphrase
 
-        # List files to verify correct setup
+        # List files to verify
         ls -la .cr-gpg
-        ls -la /home/runner/.gnupg
-        pwd
       env:
-        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}  # Private key stored in GitHub Secrets
-        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}    # Passphrase also stored securely
+        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
-    # Step 5: Add any dependent Helm repositories found in chart dependencies
     - name: Add repositories
       run: |
-        # Loop through all subdirectories under springboot-chart and add listed dependencies
         for dir in $(ls -d charts/springboot-chart/*/); do
           helm dependency list $dir 2> /dev/null | tail +2 | head -n -1 | awk '{ print "helm repo add " $1 " " $3 }' | while read cmd; do $cmd; done
         done
-        
-   # Step 6: Update chart dependencies before releasing
+      
     - name: Dependency update
       run: |
         cd charts/springboot-chart
-        helm dependency update  # Download/update chart dependencies
-        
+        helm dependency update
 
-    - name: Move Chart.yaml to templates folder
-      run: |
-        echo "Moving Chart.yaml to correct directory"
-        mv charts/springboot-chart/Chart.yaml  charts/springboot-chart/templates/Chart.yaml
-
-    # Step 7: Run the Helm Chart Releaser action to sign and upload Helm charts to GitHub Pages
     - name: Run chart-releaser
       uses: helm/chart-releaser-action@v1.7.0
       with:
-        charts_dir: ./charts/springboot-chart/  # Directory containing Helm charts
+        charts_dir: ./charts/springboot-chart/
       env:
-        CR_TOKEN: ${{ secrets.PAT }}               # GitHub Personal Access Token to create releases
-        CR_KEY: ${{ secrets.CR_KEY_ID }}           # GPG Key ID used for signing
-        CR_SIGN: true                              # Enable chart signing
-        CR_SKIP_EXISTING: true                     # Skip charts that already exist
-        CR_GPG_DIR: .cr-gpg                        # Path to the GPG directory prepared earlier
+        CR_TOKEN: ${{ secrets.PAT }}
+        CR_KEY: ${{ secrets.CR_KEY_ID }}
+        CR_SIGN: true
+        CR_SKIP_EXISTING: true
+        CR_GPG_DIR: .cr-gpg
