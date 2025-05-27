@@ -71,6 +71,11 @@ jobs:
       run: |
         cd charts/springboot-chart
         helm dependency update
+    
+    - name: Move Chart.yaml to templates folder
+      run: |
+        echo "Moving Chart.yaml to correct directory"
+        cp charts/springboot-chart/Chart.yaml  charts/springboot-chart/templates/Chart.yaml
 
     - name: Run chart-releaser
       uses: helm/chart-releaser-action@v1.7.0
