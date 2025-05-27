@@ -81,7 +81,7 @@ resources: {}
 
 
 healthCheck:
-  enabled: false
+  enabled: true
   readinessProbe:
     httpGet:
       path: /actuator/health
