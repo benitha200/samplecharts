@@ -67,6 +67,7 @@ jobs:
 
         # List files to verify correct setup
         ls -la .cr-gpg
+        ls -la .gnupg
       env:
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}  # Private key stored in GitHub Secrets
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}    # Passphrase also stored securely
