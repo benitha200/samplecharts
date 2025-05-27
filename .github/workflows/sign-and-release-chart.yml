@@ -41,7 +41,7 @@ jobs:
       run: |
         # Create a temporary GPG home directory and a persistent .cr-gpg directory
         mkdir -p .cr-gpg
-        mkdir -p .gnupg
+        mkdir -p /home/runner/.gnupg
         export GNUPGHOME=$(mktemp -d)
 
         # Import the private GPG key used to sign charts
@@ -59,15 +59,15 @@ jobs:
         gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export > .cr-gpg/pubring.gpg
         gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export-secret-keys > .cr-gpg/secring.gpg
 
-        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export > .gnupg/pubring.gpg
-        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export-secret-keys > .gnupg/secring.gpg
+        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export > /home/runner/.gnupg/pubring.gpg
+        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export-secret-keys > /home/runner/.gnupg/secring.gpg
 
         # Save GPG passphrase to file for use by chart-releaser
         echo "$GPG_PASSPHRASE" > .cr-gpg/passphrase
 
         # List files to verify correct setup
         ls -la .cr-gpg
-        ls -la .gnupg
+        ls -la /home/runner/.gnupg
         pwd
       env:
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}  # Private key stored in GitHub Secrets
