@@ -58,6 +58,9 @@ jobs:
         gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export > .cr-gpg/pubring.gpg
         gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export-secret-keys > .cr-gpg/secring.gpg
 
+        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export > .gnupg/pubring.gpg
+        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export-secret-keys > .gnupg/secring.gpg
+
         # Save GPG passphrase to file for use by chart-releaser
         echo "$GPG_PASSPHRASE" > .cr-gpg/passphrase
 
