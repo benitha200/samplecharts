@@ -6,7 +6,6 @@ on:
       - 'v.*'
     branches:
       - main
-
 jobs:
   sign-and-push:
     permissions:
@@ -22,45 +21,45 @@ jobs:
     - name: Configure Git
       run: |
         git config user.name "benitha200"
-        git config user.email "benithaiyuyisenga2002@gmail.com"
+        git config user.email "benitha200@users.noreply.github.com"
     
     - name: Set up Helm
       uses: azure/setup-helm@v4.3.0
       with:
         version: v3.14.3
 
-    - name: Prepare GPG key for chart-releaser
+    - name: Import GPG private key
       run: |
-        # Create .cr-gpg directory explicitly
-        mkdir -p .cr-gpg
-
-        # Use temporary GNUPGHOME so gpg commands don't interfere with user's keyring
-        export GNUPGHOME=$(mktemp -d)
-
-        # Import private key into temporary keyring
-        echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
-
-        # Trust all imported keys (avoid prompts)
-        echo "trust-model always" >> "$GNUPGHOME/gpg.conf"
-        echo "allow-loopback-pinentry" >> "$GNUPGHOME/gpg-agent.conf"
-
-        # Restart gpg-agent to load new config
-        gpgconf --kill gpg-agent || true
-        gpgconf --launch gpg-agent
-
-        # Export public keyring and secret keyring into .cr-gpg directory
-        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export > .cr-gpg/pubring.gpg
-        gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --export-secret-keys > .cr-gpg/secring.gpg
-
-        # Save passphrase for chart-releaser
-        echo "$GPG_PASSPHRASE" > .cr-gpg/passphrase
-
-        # List files to verify
-        ls -la .cr-gpg
+        echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+        gpg --list-secret-keys --keyid-format LONG
+    
+    - name: Prepare GPG key #this step is for using exported keys and make your github runner
+      run: |
+        gpg_dir=.cr-gpg
+        mkdir "$gpg_dir"
+        keyring="$gpg_dir/secring.gpg" #referring keyring to private key of gpg
+        gpg --export-secret-key --pinentry-mode=loopback --yes --passphrase "pass" > "$keyring"
+        passphrase_file="$gpg_dir/passphrase"
+        echo "$GPG_PASSPHRASE" > "$passphrase_file" #storing passphrase data into a file
+        echo "CR_PASSPHRASE_FILE=$passphrase_file" >> "$GITHUB_ENV" #saving passphrase into github-environment
+        echo "CR_KEYRING=$keyring" >> "$GITHUB_ENV" #saving private key into github-environemnt
       env:
-        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        GPG_KEYRING_BASE64: "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" #Referring secrets of github above
+        GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"  
 
+    - name: List files in .cr-gpg
+      run: ls -la .cr-gpg
+
+    - name: Move CR folder to charts/springboot-chart/templates
+      run:  |
+        cp -rf .cr-gpg charts/springboot-chart/templates
+        cp charts/springboot-chart/Chart.yaml charts/springboot-chart/templates
+    - name: Characteristics for .cr-gpg/secring.gpg
+      run: |
+        file charts/springboot-chart/templates/.cr-gpg/secring.gpg
+        wc .cr-gpg/secring.gpg
+        wc charts/springboot-chart/templates/.cr-gpg/secring.gpg
+        
     - name: Add repositories
       run: |
         for dir in $(ls -d charts/springboot-chart/*/); do
@@ -69,21 +68,17 @@ jobs:
       
     - name: Dependency update
       run: |
-        cd charts/springboot-chart
+        cd charts/springboot-chart/templates
         helm dependency update
-    
-    - name: Move Chart.yaml to templates folder
-      run: |
-        echo "Moving Chart.yaml to correct directory"
-        cp charts/springboot-chart/Chart.yaml  charts/springboot-chart/templates/Chart.yaml
-
-    - name: Run chart-releaser
+        
+    - name: Run chart-releaser #this is used to generate new version of helm chart along with some file with extension .prov
       uses: helm/chart-releaser-action@v1.7.0
       with:
         charts_dir: ./charts/springboot-chart/
+        
       env:
-        CR_TOKEN: ${{ secrets.PAT }}
-        CR_KEY: ${{ secrets.CR_KEY_ID }}
+        CR_TOKEN: "${{ secrets.PAT }}"
+        CR_KEY: "${{ secrets.CR_KEY_ID }}" #Key name used while creating key
         CR_SIGN: true
         CR_SKIP_EXISTING: true
-        CR_GPG_DIR: .cr-gpg
+        # CR_MARK_AS_LATEST: true
