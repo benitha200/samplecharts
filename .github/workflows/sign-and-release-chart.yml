@@ -64,6 +64,7 @@ jobs:
 
         # Save GPG passphrase to file for use by chart-releaser
         echo "$GPG_PASSPHRASE" > .cr-gpg/passphrase
+        echo "$GPG_PASSPHRASE" > /home/runner/.gnupg/passphrase
 
         # List files to verify correct setup
         ls -la .cr-gpg
