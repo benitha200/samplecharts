@@ -75,6 +75,11 @@ jobs:
           helm dependency list $dir 2> /dev/null | tail +2 | head -n -1 | awk '{ print "helm repo add " $1 " " $3 }' | while read cmd; do $cmd; done
         done
 
+    - name: Move Chart.yaml to templates folder
+      run: |
+        echo "Moving Chart.yaml to correct directory"
+        mv charts/springboot-chart/Chart.yaml  charts/springboot-chart/templates/Chart.yaml
+
     # Step 6: Update chart dependencies before releasing
     - name: Dependency update
       run: |
