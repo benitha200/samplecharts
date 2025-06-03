@@ -48,8 +48,8 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: LoadBalancer
-  #type: ClusterIP
+  #type: LoadBalancer
+  type: ClusterIP
   port: 80
 
 ingress:
@@ -87,7 +87,7 @@ healthCheck:
     httpGet:
       path: /actuator/health
       port: http
-    initialDelaySeconds: 25
+    initialDelaySeconds: 60
     periodSeconds: 5
     timeoutSeconds: 10
     successThreshold: 1
@@ -97,7 +97,7 @@ healthCheck:
     httpGet:
       path: /actuator/health
       port: http
-    initialDelaySeconds: 30
+    initialDelaySeconds: 60
     periodSeconds: 10
     timeoutSeconds: 10
     successThreshold: 1
