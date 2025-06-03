@@ -91,7 +91,7 @@ healthCheck:
     periodSeconds: 5
     timeoutSeconds: 10
     successThreshold: 1
-    failureThreshold: 3
+    failureThreshold: 6
 
   livenessProbe:
     httpGet:
@@ -101,7 +101,7 @@ healthCheck:
     periodSeconds: 10
     timeoutSeconds: 10
     successThreshold: 1
-    failureThreshold: 3
+    failureThreshold: 6
 
 
 
