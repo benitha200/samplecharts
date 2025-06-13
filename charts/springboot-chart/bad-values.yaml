@@ -1,0 +1,6 @@
+# bad-values.yaml
+replicaCount: "not-an-integer"   # Should be an integer
+image:
+  repository: ""                 # Empty string (violates minLength)
+  tag: ""                        # Empty string (violates minLength)
+  pullPolicy: "Sometimes"        # Invalid enum
