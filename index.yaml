@@ -9,7 +9,7 @@ entries:
     name: springboot-chart
     type: application
     urls:
-    - https://github.com/benitha200/samplecharts/releases/download/springboot-chart-0.1.40/springboot-chart-0.1.40.tgz
+    - https://benitha200.github.io/samplecharts/springboot-chart-0.1.40.tgz
     version: 0.1.40
   - apiVersion: v2
     appVersion: 1.16.0
