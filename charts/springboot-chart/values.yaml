@@ -14,7 +14,7 @@ replicaCount: 1
 image:
   repository: iyuyisenga/springboot-demo
   tag: v2.1.7
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
