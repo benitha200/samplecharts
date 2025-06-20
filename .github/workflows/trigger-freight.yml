@@ -11,11 +11,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Update file
+      - name: Push changes
         run: |
-          date > last_updated.txt
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add last_updated.txt
+          git add .
           git commit -m "Trigger freight creation"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUSH_PAT }} 
+
