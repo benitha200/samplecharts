@@ -13,6 +13,16 @@ entries:
     version: 0.1.40
   - apiVersion: v2
     appVersion: 1.16.9
+    created: "2025-06-20T11:10:46.331195643Z"
+    description: A Helm chart for Kubernetes - springboot demo App
+    digest: 46292ec5ba7aa0fcb1f83ae4711417db93b37f094116d6d253a0f422b06b6638
+    name: springboot-chart
+    type: application
+    urls:
+    - https://github.com/benitha200/samplecharts/releases/download/springboot-chart-0.1.20/springboot-chart-0.1.20.tgz
+    version: 0.1.20
+  - apiVersion: v2
+    appVersion: 1.16.9
     created: "2025-06-20T10:30:47.133600788Z"
     description: A Helm chart for Kubernetes - springboot demo App
     digest: 394380c55ab2bc85dac8d37906a0fccce0a2b7f1afe4d827c6e545ca6d307981
@@ -61,4 +71,4 @@ entries:
     urls:
     - https://github.com/benitha200/samplecharts/releases/download/springboot-chart-0.1.0/springboot-chart-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-20T10:30:47.133631595Z"
+generated: "2025-06-20T11:10:46.331248633Z"
