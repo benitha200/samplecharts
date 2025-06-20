@@ -1,0 +1,21 @@
+name: Trigger Freight Creation
+
+on:
+  repository_dispatch:
+    types: [trigger_freight]
+
+jobs:
+  update-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update file
+        run: |
+          date > last_updated.txt
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add last_updated.txt
+          git commit -m "Trigger freight creation"
+          git push
