@@ -16,7 +16,8 @@ image:
   tag: v2.2.5
   pullPolicy: IfNotPresent
 
-imagePullSecrets: []
+imagePullSecrets:
+  - name: dockerhub-secret
 nameOverride: ""
 fullnameOverride: ""
 containerPort: 8081
