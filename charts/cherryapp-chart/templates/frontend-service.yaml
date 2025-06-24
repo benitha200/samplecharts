@@ -7,5 +7,5 @@ spec:
   selector:
     app: cherry-frontend
   ports:
-    - port: 80
+    - port: 5173
       targetPort: {{ .Values.frontend.port }}
