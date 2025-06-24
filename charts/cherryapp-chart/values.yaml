@@ -9,7 +9,7 @@ backend:
 # Frontend image
 frontend:
   image:
-    repository: iyuyisenga/cherry-app-frontend
+    repository: iyuyisenga/cherry-app-frontend-test
     tag: latest
     pullPolicy: IfNotPresent
   port: 80
