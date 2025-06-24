@@ -27,5 +27,5 @@ mysql:
 # Service types
 service:
   backendType: ClusterIP
-  frontendType: LoadBalancer
+  frontendType: ClusterIP
 
