@@ -2,16 +2,16 @@
 backend:
   image:
     repository: iyuyisenga/cherry-app-backend-test
-    tag: latest
-    pullPolicy: Always
+    tag: v1.1.0
+    pullPolicy: IfNotPresent
   port: 3000
 
 # Frontend image
 frontend:
   image:
     repository: iyuyisenga/cherry-app-frontend-test
-    tag: latest
-    pullPolicy: Always
+    tag: v1.1.0
+    pullPolicy: IfNotPresent
   port: 5173
 
 # MySQL settings
