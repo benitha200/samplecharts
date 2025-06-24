@@ -1,4 +1,4 @@
-# Backend image
+# Backend image details
 backend:
   image:
     repository: iyuyisenga/cherry-app-backend-test
