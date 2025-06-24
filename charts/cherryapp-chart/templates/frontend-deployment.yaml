@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cherry-frontend
+spec:
+  selector:
+    matchLabels:
+      app: cherry-frontend
+  template:
+    metadata:
+      labels:
+        app: cherry-frontend
+    spec:
+      containers:
+        - name: cherry-frontend
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.frontend.port }}
+          env:
+            - name: BACKEND_URL
+              value: "http://cherry-backend:{{ .Values.backend.port }}"
