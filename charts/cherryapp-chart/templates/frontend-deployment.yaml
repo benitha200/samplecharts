@@ -17,5 +17,6 @@ spec:
           ports:
             - containerPort: {{ .Values.frontend.port }}
           env:
-            - name: BACKEND_URL
-              value: "http://cherry-backend:{{ .Values.backend.port }}"
+            - name: VITE_API_URL
+              value: "http://cherry-backend.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.backend.port }}/api"
+

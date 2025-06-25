@@ -1,30 +1,20 @@
-# Backend image details
 backend:
   image:
     repository: iyuyisenga/cherry-app-backend-test
     tag: v1.1.8
-    pullPolicy: IfNotPresent
   port: 3000
 
-# Frontend image
 frontend:
   image:
     repository: iyuyisenga/cherry-app-frontend-test
     tag: v1.1.2
-    pullPolicy: IfNotPresent
   port: 5173
 
-# MySQL settings
 mysql:
   image: mysql:8
-  rootPassword: rootpassword
-  database: cherrydb
-  user: cherryuser
-  password: cherrypassword
   port: 3306
-  storage: 5Gi  # Can be managed by Longhorn
+  storage: 5Gi
 
-# Service types
 service:
   backendType: ClusterIP
   frontendType: ClusterIP

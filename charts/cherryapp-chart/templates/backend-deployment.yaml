@@ -17,6 +17,8 @@ spec:
           ports:
             - containerPort: {{ .Values.backend.port }}
           env:
+            - name: DATABASE_URL
+              value: "mysql://$(DB_USER):$(DB_PASSWORD)@mysql:$(DB_PORT)/$(DB_NAME)"
             - name: DB_HOST
               value: mysql
             - name: DB_PORT
@@ -24,15 +26,16 @@ spec:
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: mysql-secret
+                  name: mysql-secret-{{ .Release.Namespace }}
                   key: mysql-user
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-secret
+                  name: mysql-secret-{{ .Release.Namespace }}
                   key: mysql-password
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: mysql-secret
+                  name: mysql-secret-{{ .Release.Namespace }}
                   key: mysql-database
+
