@@ -13,7 +13,7 @@ replicaCount: 1
 
 image:
   repository: iyuyisenga/springboot-demo
-  tag: v2.2.9
+  tag: v3.0.0
   pullPolicy: IfNotPresent
 
 imagePullSecrets:
