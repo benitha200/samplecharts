@@ -8,6 +8,7 @@ frontend:
   image:
     repository: iyuyisenga/cherry-app-frontend-test
     tag: v1.1.2
+    pullPolicy: IfNotPresent
   port: 5173
 
 mysql:
