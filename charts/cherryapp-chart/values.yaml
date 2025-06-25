@@ -10,7 +10,7 @@ backend:
 frontend:
   image:
     repository: iyuyisenga/cherry-app-frontend-test
-    tag: v1.1.1
+    tag: main
     pullPolicy: IfNotPresent
   port: 5173
 
