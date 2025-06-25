@@ -20,3 +20,4 @@ spec:
             - name: VITE_API_URL
               value: "http://cherry-backend.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.backend.port }}/api"
 
+
