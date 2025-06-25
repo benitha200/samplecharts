@@ -13,6 +13,10 @@ frontend:
 
 mysql:
   image: mysql:8
+  rootPassword: "rootpassword"  # Ensure quoted strings
+  database: "cherrydb"
+  user: "cherryuser"
+  password: "cherrypassword"
   port: 3306
   storage: 5Gi
 
