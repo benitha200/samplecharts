@@ -22,6 +22,10 @@ nameOverride: ""
 fullnameOverride: ""
 containerPort: 8081
 
+servicenames:
+  stable: springboot-chart-stable
+  canary: springboot-chart-canary
+
 
 serviceAccount:
   # Specifies whether a service account should be created
