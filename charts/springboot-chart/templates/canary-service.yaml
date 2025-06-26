@@ -1,15 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "springboot-chart.fullname" . }}
+  name: springboot-canary
   labels:
     {{- include "springboot-chart.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: 80
       targetPort: {{ .Values.containerPort }}
-      protocol: TCP
-      name: http
   selector:
     {{- include "springboot-chart.selectorLabels" . | nindent 4 }}

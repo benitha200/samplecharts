@@ -53,6 +53,46 @@ service:
   type: ClusterIP
   port: 80
 
+# Istio Configuration
+istio:
+  enabled: true
+  # Use existing Istio gateway in cluster
+  gateway: "istio-system/ingressgateway"
+  # Internal hostname for service-to-service communication
+  host: "springboot-app.internal"
+  virtualService:
+    name: springboot-vs
+    # Gateway where the VS should be applied
+    gateway: "istio-system/ingressgateway"
+    # HTTP routes configuration
+    http:
+      - name: primary
+        route:
+          - destination:
+              host: springboot-stable.svc.cluster.local  # Stable service FQDN
+            weight: 100
+          - destination:
+              host: springboot-canary.svc.cluster.local   # Canary service FQDN
+            weight: 0
+
+# Rollout Configuration
+rollout:
+  trafficRouting:
+    istio:
+      virtualService:
+        name: springboot-vs
+        routes:
+        - primary
+      stableService: springboot-stable   # Service for stable pods
+      canaryService: springboot-canary   # Service for canary pods
+  
+  steps:
+    - setWeight: 25
+    - pause: { duration: 2m }
+    - setWeight: 50
+    - pause: { duration: 2m }
+    - setWeight: 100
+
 ingress:
   enabled: false
   className: ""

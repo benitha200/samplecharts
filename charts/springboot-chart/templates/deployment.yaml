@@ -14,16 +14,33 @@ spec:
   selector:
     matchLabels:
       {{- include "springboot-chart.selectorLabels" . | nindent 6 }}
+  # strategy:
+  #   canary:
+  #     steps:
+  #       - setWeight: 25
+  #       - pause: { duration: 2m }
+  #       - setWeight: 50
+  #       - pause: { duration: 2m }
+  #       - setWeight: 100
+
+  spec:
   strategy:
     canary:
-      maxSurge: 1         # Allow one extra pod during update
-      maxUnavailable: 0   # Keep all current pods running
+      trafficRouting:
+        istio:
+          virtualService:
+            name: springboot-vs  # Istio VirtualService name
+            routes:
+            - primary            # Must match route in VirtualService
+      canaryService: springboot-canary  # Service for canary pods
+      stableService: springboot-stable   # Service for stable pods
       steps:
         - setWeight: 25
         - pause: { duration: 2m }
         - setWeight: 50
         - pause: { duration: 2m }
         - setWeight: 100
+
   template:
     metadata:
       {{- with .Values.podAnnotations }}
