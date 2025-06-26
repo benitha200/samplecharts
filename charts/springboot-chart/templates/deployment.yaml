@@ -16,6 +16,8 @@ spec:
       {{- include "springboot-chart.selectorLabels" . | nindent 6 }}
   strategy:
     canary:
+      maxSurge: 1         # Allow one extra pod during update
+      maxUnavailable: 0   # Keep all current pods running
       steps:
         - setWeight: 100
         - pause: { duration: 5m }
