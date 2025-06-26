@@ -56,9 +56,7 @@ service:
 # Istio Configuration
 istio:
   enabled: true
-  # Use existing Istio gateway in cluster
   gateway: "istio-system/ingressgateway"
-  # Internal hostname for service-to-service communication
   host: "springboot-app.internal"
   virtualService:
     name: springboot-vs

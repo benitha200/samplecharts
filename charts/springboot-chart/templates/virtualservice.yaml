@@ -9,5 +9,12 @@ spec:
   gateways:
     - "{{ .Values.istio.gateway }}"
   http:
-    {{- toYaml .Values.istio.virtualService.http | nindent 4 }}
+    - name: primary
+      route:
+        - destination:
+            host: {{ include "springboot-chart.fullname" . }}-stable.{{ .Release.Namespace }}.svc.cluster.local
+          weight: 100
+        - destination:
+            host: {{ include "springboot-chart.fullname" . }}-canary.{{ .Release.Namespace }}.svc.cluster.local
+          weight: 0
 {{- end }}

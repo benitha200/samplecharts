@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: springboot-canary
+  name: {{ include "springboot-chart.fullname" . }}-canary
   labels:
     {{- include "springboot-chart.labels" . | nindent 4 }}
 spec:
