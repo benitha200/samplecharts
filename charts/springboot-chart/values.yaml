@@ -22,7 +22,7 @@ nameOverride: ""
 fullnameOverride: ""
 containerPort: 8081
 
-servicenames:
+serviceNames:
   stable: springboot-chart-stable
   canary: springboot-chart-canary
 
