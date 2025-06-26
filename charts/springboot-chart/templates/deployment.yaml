@@ -19,10 +19,10 @@ spec:
       maxSurge: 1         # Allow one extra pod during update
       maxUnavailable: 0   # Keep all current pods running
       steps:
-        - setWeight: 100
-        - pause: { duration: 5m }
-        - setWeight: 100
-        - pause: { duration: 5m }
+        - setWeight: 25
+        - pause: { duration: 30s }
+        - setWeight: 50
+        - pause: { duration: 30s }
         - setWeight: 100
   template:
     metadata:
