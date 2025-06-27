@@ -24,8 +24,8 @@ containerPort: 8081
 
 
 serviceNames:
-  stable: springboot-demo-stable
-  canary: springboot-demo-canary
+  stable: stable
+  canary: canary
 
 serviceAccount:
   # Specifies whether a service account should be created
