@@ -35,9 +35,11 @@ spec:
       canaryService: "springboot-demo-canary"
       stableService: "springboot-demo-stable"
       trafficRouting:
-        # Use Kubernetes Service for traffic splitting
-        # (No Ingress required)
-        istio: {}
+      istio:
+        virtualService:
+          name: samplecharts-dev-springboot-chart-virtualservice
+          routes:
+            - http
       steps:
         - setWeight: 25
         - pause: { duration: 30s }
