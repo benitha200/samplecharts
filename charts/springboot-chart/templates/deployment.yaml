@@ -32,8 +32,8 @@ spec:
   strategy:
     canary:
       # Service reference for traffic splitting
-      canaryService: {{ include "springboot-chart.fullname" . }}-canary
-      stableService: {{ include "springboot-chart.fullname" . }}-stable
+      canaryService: "springboot-demo-canary"
+      stableService: "springboot-demo-stable"
       trafficRouting:
         # Use Kubernetes Service for traffic splitting
         # (No Ingress required)
