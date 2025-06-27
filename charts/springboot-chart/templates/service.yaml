@@ -14,21 +14,3 @@ spec:
   selector:
     {{- include "springboot-chart.selectorLabels" . | nindent 4 }}
     version: stable
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Values.serviceNames.canary}}
-  labels:
-    {{- include "springboot-chart.labels" . | nindent 4 }}
-spec:
-  type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.containerPort }}
-      protocol: TCP
-      name: http
-  selector:
-    {{- include "springboot-chart.selectorLabels" . | nindent 4 }}
-    version: canary
