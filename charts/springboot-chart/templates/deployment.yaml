@@ -31,15 +31,15 @@ spec:
       {{- include "springboot-chart.selectorLabels" . | nindent 6 }}
   strategy:
     canary:
-      # Service reference for traffic splitting
       canaryService: "springboot-demo-canary"
       stableService: "springboot-demo-stable"
       trafficRouting:
-      istio:
-        virtualService:
-          name: samplecharts-dev-springboot-chart-virtualservice
-          routes:
-            - http
+        istio:  # This was not properly indented
+          virtualService:
+            name: samplecharts-dev-springboot-chart-virtualservice
+            routes:
+              - primary  # Changed from 'http' to match VirtualService route name
+
       steps:
         - setWeight: 25
         - pause: { duration: 30s }

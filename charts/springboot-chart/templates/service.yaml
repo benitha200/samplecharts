@@ -5,14 +5,12 @@ metadata:
   labels:
     {{- include "springboot-chart.labels" . | nindent 4 }}
 spec:
-  selector:
-      app: samplecharts-dev-springboot-chart
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.containerPort }}
       protocol: TCP
       name: http
-  selector:
+  selector:  # Remove the duplicate selector above
     {{- include "springboot-chart.selectorLabels" . | nindent 4 }}
     version: stable

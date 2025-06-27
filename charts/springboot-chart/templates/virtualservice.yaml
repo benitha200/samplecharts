@@ -7,10 +7,11 @@ spec:
   hosts:
     - 'samplecharts-dev-springboot-chart.dev.svc.cluster.local'
   http:
-    - route:
+    - name: primary  # Add this name field
+      route:
         - destination:
-            host: samplecharts-dev-springboot-chart-stable
+            host: springboot-demo-stable  # Changed to match your actual service
           weight: 100
         - destination:
-            host: samplecharts-dev-springboot-chart-canary
+            host: springboot-demo-canary  # Changed to match your actual service
           weight: 0
