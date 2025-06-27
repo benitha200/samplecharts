@@ -5,6 +5,8 @@ metadata:
   labels:
     {{- include "springboot-chart.labels" . | nindent 4 }}
 spec:
+  selector:
+    app: samplecharts-dev
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
