@@ -1,4 +1,4 @@
-apiVersion: argoproj.io/v1alpha1  # Correct API version for Argo Rollouts
+apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: {{ include "springboot-chart.fullname" . }}
@@ -6,6 +6,21 @@ metadata:
     {{- include "springboot-chart.labels" . | nindent 4 }}
   annotations:
     argocd.argoproj.io/sync-options: Replace=true
+    # Enable IP tracking in metrics
+    rollout.argoproj.io/metrics: |
+      - name: request-source-ips
+        interval: 30s
+        provider:
+          prometheus:
+            address: http://prometheus-service:9090
+            query: |
+              count by (source_ip) (
+                http_requests_total{
+                  namespace="{{ .Release.Namespace }}",
+                  service="{{ include "springboot-chart.fullname" . }}",
+                  version="canary"
+                }
+              )
 
 spec:
   {{- if not .Values.autoscaling.enabled }}
@@ -16,6 +31,13 @@ spec:
       {{- include "springboot-chart.selectorLabels" . | nindent 6 }}
   strategy:
     canary:
+      # Service reference for traffic splitting
+      canaryService: {{ include "springboot-chart.fullname" . }}-canary
+      stableService: {{ include "springboot-chart.fullname" . }}-stable
+      trafficRouting:
+        # Use Kubernetes Service for traffic splitting
+        # (No Ingress required)
+        istio: {}
       steps:
         - setWeight: 25
         - pause: { duration: 30s }
@@ -33,6 +55,8 @@ spec:
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        # Add version label for tracking
+        version: "{{ .Values.image.tag | default .Chart.AppVersion }}"
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -59,6 +83,10 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          # Add IP tracking environment variable
+          env:
+            - name: TRACK_SOURCE_IPS
+              value: "true"
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
