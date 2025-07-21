@@ -1,4 +1,4 @@
-apiVersion: argoproj.io/v1alpha1  # Correct API version for Argo Rollouts
+apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: {{ include "springboot-chart.fullname" . }}
@@ -6,6 +6,21 @@ metadata:
     {{- include "springboot-chart.labels" . | nindent 4 }}
   annotations:
     argocd.argoproj.io/sync-options: Replace=true
+    # Enable IP tracking in metrics
+    rollout.argoproj.io/metrics: |
+      - name: request-source-ips
+        interval: 30s
+        provider:
+          prometheus:
+            address: http://prometheus-service:9090
+            query: |
+              count by (source_ip) (
+                http_requests_total{
+                  namespace="{{ .Release.Namespace }}",
+                  service="{{ include "springboot-chart.fullname" . }}",
+                  version="canary"
+                }
+              )
 
 spec:
   {{- if not .Values.autoscaling.enabled }}
@@ -27,6 +42,7 @@ spec:
   strategy:
     canary:
 <<<<<<< HEAD
+<<<<<<< HEAD
       trafficRouting:
         istio:
           virtualService:
@@ -37,6 +53,17 @@ spec:
       stableService: springboot-stable   # Service for stable pods
 =======
 >>>>>>> 8289aede54953c4cf73932a0e90a1487adbff261
+=======
+      canaryService: "springboot-demo-canary"
+      stableService: "springboot-demo-stable"
+      trafficRouting:
+        istio:  # This was not properly indented
+          virtualService:
+            name: samplecharts-dev-springboot-chart-virtualservice
+            routes:
+              - primary  # Changed from 'http' to match VirtualService route name
+
+>>>>>>> 21ddd0b1868fa543f04896b22eaabc73a06e99b5
       steps:
         - setWeight: 25
         - pause: { duration: 2m }
@@ -55,6 +82,8 @@ spec:
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        # Add version label for tracking
+        version: "{{ .Values.image.tag | default .Chart.AppVersion }}"
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -81,6 +110,10 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          # Add IP tracking environment variable
+          env:
+            - name: TRACK_SOURCE_IPS
+              value: "true"
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}

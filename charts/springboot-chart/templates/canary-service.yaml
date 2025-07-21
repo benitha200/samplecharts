@@ -1,12 +1,52 @@
 apiVersion: v1
 kind: Service
 metadata:
+<<<<<<< HEAD
+<<<<<<<< HEAD:charts/springboot-chart/templates/canary-service.yaml
   name: {{ .Values.serviceNames.canary | default "springboot-canary" }}
+========
+  name: {{ .Values.serviceNames.stable}}
+>>>>>>>> 21ddd0b1868fa543f04896b22eaabc73a06e99b5:charts/springboot-chart/templates/service.yaml
   labels:
     {{- include "springboot-chart.labels" . | nindent 4 }}
 spec:
   ports:
     - port: 80
       targetPort: {{ .Values.containerPort }}
+<<<<<<<< HEAD:charts/springboot-chart/templates/canary-service.yaml
   selector:
+========
+      protocol: TCP
+      name: http
+  selector:  # Remove the duplicate selector above
+>>>>>>>> 21ddd0b1868fa543f04896b22eaabc73a06e99b5:charts/springboot-chart/templates/service.yaml
     {{- include "springboot-chart.selectorLabels" . | nindent 4 }}
+    version: stable
+=======
+  name: {{ .Values.serviceNames.canary}}
+  labels:
+    {{- include "springboot-chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.containerPort }}
+      protocol: TCP
+      name: http
+  selector:  # Remove the duplicate selector above
+    {{- include "springboot-chart.selectorLabels" . | nindent 4 }}
+    version: canary
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: {{ .Values.serviceNames.canary | default "springboot-canary" }}
+#   labels:
+#     {{- include "springboot-chart.labels" . | nindent 4 }}
+# spec:
+#   ports:
+#     - port: 80
+#       targetPort: {{ .Values.containerPort }}
+#   selector:
+#     {{- include "springboot-chart.selectorLabels" . | nindent 4 }}
+>>>>>>> 21ddd0b1868fa543f04896b22eaabc73a06e99b5

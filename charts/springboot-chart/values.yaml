@@ -13,7 +13,7 @@ replicaCount: 1
 
 image:
   repository: iyuyisenga/springboot-demo
-  tag: v3.1.5
+  tag: v3.2.2
   pullPolicy: IfNotPresent
 
 imagePullSecrets:
@@ -26,6 +26,10 @@ serviceNames:
   stable: springboot-chart-stable
   canary: springboot-chart-canary
 
+
+serviceNames:
+  stable: springboot-demo-stable
+  canary: springboot-demo-canary
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -87,7 +91,6 @@ rollout:
         - primary
       stableService: springboot-stable   # Service for stable pods
       canaryService: springboot-canary   # Service for canary pods
-  
   steps:
     - setWeight: 25
     - pause: { duration: 2m }
@@ -96,20 +99,18 @@ rollout:
     - setWeight: 100
 
 ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  enabled: true
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "203.0.113.5/32,198.51.100.0/24"  # Allowed IPs
   hosts:
-    - host: chart-example.local
+    - host: springboot-canary.example.com
       paths:
         - path: /
           pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
